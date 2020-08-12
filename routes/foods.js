@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const foodPlaces = await FoodPlaces.find()
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       data: foodPlaces
     })
