@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const app = require('../app')
 const request = require('supertest')
 
-// GET -> POST -> DELETE -> UPDATE
+// GET -> POST -> UPDATE -> DELETE
 
 beforeAll(async () => {
   await mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
@@ -86,6 +86,35 @@ describe('POST new foodplace and see if there is new data object created', () =>
       .post('/api/foodplaces')
       .send(failedPost)
       .expect(400)
+  })
+})
+
+describe('Test for UPDATE request', () => {
+  it('Update by id', async () => {
+    // GET foodplaces._id
+    const res = await request(app).get('/api/foodplaces')
+    const data = res.body.data
+    const idArray = data.map(f => f._id)
+    const firstID = idArray[0]
+
+    const updatePost = {
+      name: 'Mala Soup',
+      genre: 'Chinese',
+      location: 'Gek Poh Shopping Centre',
+      country: 'Singapore',
+      bus: '243, 181',
+      train: 'nil'
+    }
+
+    // UPDATE by id
+    await request(app)
+      .patch(`/api/foodplaces/${firstID}`)
+      .send(updatePost)
+      .expect(200)
+
+    // GET by id to check if UPDATE is successful --> I changed name to mala soup, see updatePost
+    const response = await request(app).get(`/api/foodplaces/${firstID}`)
+    expect(data[0].name).toBe('Mala Soup')
   })
 })
 
